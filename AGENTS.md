@@ -41,6 +41,7 @@ Teslim ZIP'i oluşturulduktan sonra ayrı klasöre çıkarıp aynı üç kontrol
 
 - Anahtar ilk tıklamada arayüzde anında durum değiştirmelidir.
 - Mevcut öğe taraması açıksa otomatik mod etkinleştikten 1 saniye sonra arka planda başlar; UI yanıtını bekletmez.
+- Uygulama otomatik mod ve mevcut öğe taraması açıkken başlarsa etkin Masaüstü/İndirilenler kaynakları 1 saniye sonra taranır; izlenen bir kaynak sonradan açılırsa aynı telafi taraması uygulanır.
 - Otomatik mod kapanırsa planlanan taramayı iptal et.
 - Yeni dosya/klasör yazımı tamamlanmadan taşıma yapma.
 - Desteklenmeyen öğeyi “taşındı” diye bildirme.
@@ -54,6 +55,9 @@ Teslim ZIP'i oluşturulduktan sonra ayrı klasöre çıkarıp aynı üç kontrol
 - Genel Bakış ve Geçmiş ekranları yaklaşık %20 büyütülmüş tipografi kullanır; bu okunabilirlik ölçeğini sessizce geri düşürme.
 - Açıklama ve metaveri renkleri yarı saydam tema renkleri yerine opak nötr tokenlardan gelmelidir.
 - Widget ana uygulamadan bağımsızdır: 3 tasarım, 8 renk, 5 yazı tipi ve kalıcı boyut/saydamlık ayarları korunur.
+- Widget Windows `Masaüstünü göster` nedeniyle küçültülürse odağı çalmadan geri gelmeli, fakat normal uygulama pencerelerinin üstüne sabitlenmemelidir.
+- Windows masaüstü katmanına bağlanan widget dış boşluk bırakmamalı; yerel yuvarlatılmış pencere bölgesi tasarım yarıçapı ve DPI ile uyumlu kalmalıdır.
+- Widget rafında son öğe alanı öğenin kendisini, ayrı klasör düğmesi ise raf klasörünü açmalıdır.
 - Widget ayarları, Ayarlar ekranında ana arayüz görünüm ayarlarından sonra gelir.
 - Kullanıcı dosyanın algılandığını, taşınıp taşınmadığını, nereye gittiğini ve hata nedenini görebilmelidir.
 - Kullanıcının onayladığı kategori ikon seti korunmalı; Belgeler, Görseller, Arşivler, Klasörler, Kısayollar ve genel dosya fallback görselleri sebepsiz yere eski jenerik SVG setine döndürülmemelidir.

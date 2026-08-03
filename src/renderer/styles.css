@@ -90,7 +90,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 
 
-.desktop-widget-root { height:100vh; padding:10px; background:transparent; }
+.desktop-widget-root { height:100vh; padding:0; overflow:hidden; background:transparent; }
 .desktop-widget-panel {
   height:100%;
   overflow:hidden;
@@ -225,11 +225,15 @@ html[data-surface="widget"] #root {
 /* Desktop widget: independent typography, color identity, and three real surface systems. */
 .desktop-widget-root {
   height:100vh;
-  padding:8px;
+  padding:0;
+  overflow:hidden;
   background:transparent !important;
   font-family:var(--widget-font-family, "Segoe UI", sans-serif);
   text-rendering:optimizeLegibility;
 }
+[data-widget-design="glass"].desktop-widget-root { border-radius:24px; }
+[data-widget-design="minimal"].desktop-widget-root { border-radius:14px; }
+[data-widget-design="shelf"].desktop-widget-root { border-radius:20px; }
 .desktop-widget-panel {
   position:relative;
   height:100%;
@@ -252,6 +256,8 @@ html[data-surface="widget"] #root {
 .widget-shelf-row { border-radius:13px; padding:9px 10px; transition:background-color .16s ease,transform .16s ease,box-shadow .16s ease; }
 .widget-shelf-row:hover { background:rgba(255,255,255,.075); }
 .widget-shelf-row.is-empty { opacity:.6; }
+.widget-shelf-open:disabled { cursor:default; }
+.widget-shelf-open:focus-visible { border-radius:9px; outline:2px solid rgba(255,255,255,.7); outline-offset:2px; }
 .widget-resize-cue {
   position:absolute;
   right:8px;
@@ -315,7 +321,7 @@ html[data-surface="widget"] #root {
 }
 
 @media (max-width: 520px) {
-  .desktop-widget-root { padding:5px; }
+  .desktop-widget-root { padding:0; }
   .desktop-widget-panel { border-radius:18px; }
   .widget-icon-button { width:26px; height:26px; }
 }

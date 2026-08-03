@@ -96,6 +96,7 @@ export interface DestinationShelf {
   directoryPath: string;
   fileCount: number;
   latestFileName: string | null;
+  latestItemPath: string | null;
 }
 
 export interface OrganizationPreviewItem {

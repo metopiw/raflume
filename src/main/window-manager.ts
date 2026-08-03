@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { app, BrowserWindow, screen, shell } from 'electron';
 import { APP_NAME } from '../shared/brand';
@@ -13,6 +14,10 @@ export class WindowManager {
   private widgetWindow: BrowserWindow | null = null;
   private widgetCorner: AppSettings['desktopWidget']['corner'] = 'top-right';
   private widgetResizeTimer: NodeJS.Timeout | null = null;
+  private widgetRestoreTimer: NodeJS.Timeout | null = null;
+  private widgetEnabled = false;
+  private widgetDesktopHosted = false;
+  private widgetBorderRadius = 24;
   private widgetBoundsChangeHandler: ((width: number, height: number) => void) | null = null;
 
   public async create(): Promise<BrowserWindow> {
@@ -58,7 +63,10 @@ export class WindowManager {
 
   public async syncDesktopWidget(settings: AppSettings): Promise<void> {
     try {
+      this.widgetEnabled = settings.desktopWidget.enabled;
       if (!settings.desktopWidget.enabled) {
+        if (this.widgetRestoreTimer) clearTimeout(this.widgetRestoreTimer);
+        this.widgetRestoreTimer = null;
         if (this.widgetWindow && !this.widgetWindow.isDestroyed()) this.widgetWindow.hide();
         return;
       }
@@ -68,8 +76,10 @@ export class WindowManager {
       }
 
       this.widgetCorner = settings.desktopWidget.corner;
+      this.widgetBorderRadius = settings.desktopWidget.design === 'minimal' ? 14 : settings.desktopWidget.design === 'shelf' ? 20 : 24;
       this.resizeDesktopWidget(settings.desktopWidget.width, settings.desktopWidget.height, false);
       this.positionDesktopWidget(settings.desktopWidget.corner);
+      await this.hostDesktopWidget(true);
       this.widgetWindow?.showInactive();
     } catch (error) {
       log.error('Could not sync desktop widget', error);
@@ -108,11 +118,16 @@ export class WindowManager {
     });
 
     this.secureWindow(this.widgetWindow);
+    this.widgetDesktopHosted = false;
     this.widgetWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
+    this.widgetWindow.on('minimize', () => this.scheduleWidgetRestore());
     this.widgetWindow.on('resized', () => this.handleWidgetResized());
     this.widgetWindow.on('closed', () => {
       if (this.widgetResizeTimer) clearTimeout(this.widgetResizeTimer);
+      if (this.widgetRestoreTimer) clearTimeout(this.widgetRestoreTimer);
       this.widgetResizeTimer = null;
+      this.widgetRestoreTimer = null;
+      this.widgetDesktopHosted = false;
       this.widgetWindow = null;
     });
     await this.loadRenderer(this.widgetWindow, 'widget');
@@ -147,11 +162,53 @@ export class WindowManager {
         if (!this.widgetWindow || this.widgetWindow.isDestroyed()) return;
         const [width = 420, height = 560] = this.widgetWindow.getSize();
         this.positionDesktopWidget(this.widgetCorner);
+        void this.hostDesktopWidget(true);
         this.widgetBoundsChangeHandler?.(width, height);
       }, 220);
     } catch (error) {
       log.error('Could not persist desktop widget size', error);
     }
+  }
+
+  private scheduleWidgetRestore(): void {
+    if (!this.widgetEnabled) return;
+    if (this.widgetRestoreTimer) clearTimeout(this.widgetRestoreTimer);
+    this.widgetRestoreTimer = setTimeout(() => {
+      this.widgetRestoreTimer = null;
+      if (!this.widgetEnabled || !this.widgetWindow || this.widgetWindow.isDestroyed()) return;
+      if (this.widgetWindow.isMinimized()) this.widgetWindow.restore();
+      this.positionDesktopWidget(this.widgetCorner);
+      this.widgetWindow.showInactive();
+    }, 180);
+  }
+
+  private async hostDesktopWidget(force = false): Promise<void> {
+    if (process.platform !== 'win32' || (!force && this.widgetDesktopHosted) || !this.widgetWindow || this.widgetWindow.isDestroyed()) return;
+    const desktopHostPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'app.asar.unpacked', 'assets', 'RaflumeDesktopHost.exe')
+      : path.join(app.getAppPath(), 'assets', 'RaflumeDesktopHost.exe');
+    if (!existsSync(desktopHostPath)) {
+      log.warn('Desktop host helper is missing', { desktopHostPath });
+      return;
+    }
+
+    const nativeHandle = this.widgetWindow.getNativeWindowHandle();
+    const handleValue = nativeHandle.length >= 8
+      ? nativeHandle.readBigUInt64LE(0)
+      : BigInt(nativeHandle.readUInt32LE(0));
+
+    await new Promise<void>((resolve) => {
+      execFile(desktopHostPath, [handleValue.toString(), this.widgetBorderRadius.toString()], { windowsHide: true }, (error, stdout, stderr) => {
+        if (error) {
+          log.error('Could not attach widget to the Windows desktop host', { error, stderr: stderr.trim() });
+          resolve();
+          return;
+        }
+        this.widgetDesktopHosted = true;
+        log.info('Desktop widget attached to Windows desktop host', { output: stdout.trim() });
+        resolve();
+      });
+    });
   }
 
   private secureWindow(window: BrowserWindow): void {

@@ -72,8 +72,8 @@ export function SettingsPage({ settings, language, onUpdate }: SettingsPageProps
       <SettingsSection title={language === 'tr' ? 'Otomatik düzenleme kuralları' : 'Automatic organization rules'} description={language === 'tr' ? 'Otomatik modun hangi öğelere ve ne zaman dokunacağını açıkça seç.' : 'Choose exactly which items automatic mode may move and when.'}>
         <SettingRow
           icon={<ScanSearch size={18} />}
-          title={language === 'tr' ? 'Açarken mevcut öğeleri de tara' : 'Scan existing items when enabled'}
-          description={language === 'tr' ? 'Otomatik düzenleme açıldıktan bir saniye sonra Masaüstü ve İndirilenler kökündeki mevcut desteklenen öğeleri tarar. Kapalıysa yalnızca sonradan gelenleri işler.' : 'One second after automatic organization is enabled, it scans supported items already in the Desktop and Downloads roots. When off, only new arrivals are handled.'}
+          title={language === 'tr' ? 'Mevcut öğeleri de tara' : 'Scan existing items too'}
+          description={language === 'tr' ? 'Otomatik düzenleme açıldığında, uygulama otomatik mod açıkken başladığında veya yeni bir radar kaynağı etkinleştirildiğinde mevcut desteklenen öğeleri bir saniye sonra tarar. Kapalıysa yalnızca sonradan gelenleri işler.' : 'Scans existing supported items one second after automatic organization is enabled, the app starts with automatic mode active, or a new radar source is enabled. When off, only new arrivals are handled.'}
           control={<Switch checked={rules.scanExistingOnAutomaticEnable} onCheckedChange={(checked) => onUpdate({ organizationRules: { ...rules, scanExistingOnAutomaticEnable: checked } })} label={language === 'tr' ? 'Mevcut öğeleri tara' : 'Scan existing items'} />}
         />
         <SettingRow
@@ -230,7 +230,7 @@ export function SettingsPage({ settings, language, onUpdate }: SettingsPageProps
       <section className="about-strip flex flex-col gap-4 rounded-[24px] p-5 sm:flex-row sm:items-center">
         <BrandMark className="h-14 w-14 shrink-0" />
         <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-white">{t.aboutTitle}</div><p className="mt-1.5 text-xs leading-5 text-zinc-400">{t.aboutDescription}</p></div>
-        <div className="text-right text-[11px] text-zinc-500"><div>Raflume 1.6.3</div><div className="mt-1">MIT · by mertpivvo</div></div>
+        <div className="text-right text-[11px] text-zinc-500"><div>Raflume 1.6.5</div><div className="mt-1">MIT · by mertpivvo</div></div>
       </section>
     </div>
   );

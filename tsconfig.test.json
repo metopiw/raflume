@@ -16,6 +16,7 @@
     "tests/**/*.ts",
     "src/shared/**/*.ts",
     "src/main/file-move-engine.ts",
+    "src/main/destination-overview.ts",
     "src/main/organizer.ts",
     "src/main/logger.ts",
     "src/renderer/lib/appearance.ts"

@@ -4,9 +4,9 @@ import { groupShelvesBySource } from '../src/shared/shelf-utils';
 import type { DestinationShelf } from '../src/shared/types';
 
 const shelves: DestinationShelf[] = [
-  { id: 'desktop:documents', source: 'desktop', category: 'documents', directoryPath: 'C:/Desktop/Belgeler', fileCount: 2, latestFileName: 'a.pdf' },
-  { id: 'downloads:images', source: 'downloads', category: 'images', directoryPath: 'C:/Downloads/Görseller', fileCount: 3, latestFileName: 'b.png' },
-  { id: 'desktop:archives', source: 'desktop', category: 'archives', directoryPath: 'C:/Desktop/Arşivler', fileCount: 1, latestFileName: 'c.zip' },
+  { id: 'desktop:documents', source: 'desktop', category: 'documents', directoryPath: 'C:/Desktop/Belgeler', fileCount: 2, latestFileName: 'a.pdf', latestItemPath: 'C:/Desktop/Belgeler/a.pdf' },
+  { id: 'downloads:images', source: 'downloads', category: 'images', directoryPath: 'C:/Downloads/Görseller', fileCount: 3, latestFileName: 'b.png', latestItemPath: 'C:/Downloads/Görseller/b.png' },
+  { id: 'desktop:archives', source: 'desktop', category: 'archives', directoryPath: 'C:/Desktop/Arşivler', fileCount: 1, latestFileName: 'c.zip', latestItemPath: 'C:/Desktop/Arşivler/c.zip' },
 ];
 
 test('groups destination shelves without dropping Downloads', () => {

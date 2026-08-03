@@ -16,6 +16,7 @@ export async function scanDestinationShelves(watchedPaths: WatchedPaths, additio
       for (const [category, folderName] of Object.entries(CATEGORY_FOLDER_NAMES) as Array<[DestinationShelf['category'], string]>) {
         let fileCount = 0;
         let latestFileName: string | null = null;
+        let latestItemPath: string | null = null;
         let latestModified = 0;
 
         for (const rootPath of root.scanPaths) {
@@ -28,10 +29,12 @@ export async function scanDestinationShelves(watchedPaths: WatchedPaths, additio
               if (!matchesShelf) continue;
               fileCount += 1;
               try {
-                const stats = await fs.stat(path.join(directoryPath, entry.name));
+                const itemPath = path.join(directoryPath, entry.name);
+                const stats = await fs.stat(itemPath);
                 if (stats.mtimeMs > latestModified) {
                   latestModified = stats.mtimeMs;
                   latestFileName = entry.name;
+                  latestItemPath = itemPath;
                 }
               } catch (error) {
                 log.warn('Could not stat destination shelf item', { directoryPath, fileName: entry.name, error });
@@ -49,6 +52,7 @@ export async function scanDestinationShelves(watchedPaths: WatchedPaths, additio
           directoryPath: path.join(root.primaryPath, folderName),
           fileCount,
           latestFileName,
+          latestItemPath,
         });
       }
     }

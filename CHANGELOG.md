@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.6.5
+
+- Windows masaüstü katmanında çalışan widget'ın şeffaf dış boşluğunda görünen siyah dikdörtgen kaldırıldı.
+- Widget artık tasarımına uygun yerel Windows yuvarlatılmış pencere bölgesi kullanır; yeniden boyutlandırma ve tasarım değişikliğinde bu bölge yenilenir.
+- Paketlenmiş sürümlerde masaüstü yardımcısının `app.asar.unpacked` içinden güvenli biçimde çalışması sağlandı.
+
+## 1.6.4
+
+- Proje köküne, uygulama ikonunu kullanan ve `run.bat` üzerinden konsol göstermeden Raflume'u açan küçük `Raflume.exe` görev çubuğu launcher'ı eklendi.
+- Masaüstü widget'ı gerçek Windows masaüstü ikon katmanına bağlanır; `Masaüstünü göster` / `Win + D` sırasında görünür kalırken normal uygulama pencerelerinin altında kalır.
+- Otomatik mod ve mevcut öğe taraması açıkken uygulama başlangıcında Masaüstü ile İndirilenler kökü yeniden taranır; sonradan etkinleştirilen radar kaynağı da aynı güvenli telafi taramasını başlatır.
+- Widget raf satırındaki son öğe adı artık dosyanın veya klasörün kendisini açar; ayrı klasör düğmesi raf klasörünü açmaya devam eder.
+- Son öğenin tam yolunu, başlangıç tarama kararlarını ve radar etkinleştirme davranışını denetleyen regresyon testleri eklendi.
+- `AGENTS.md`, Türkçe/İngilizce arayüz açıklamaları ve uygulama sürüm bilgisi 1.6.4 davranışına göre güncellendi.
+
 ## 1.6.3
 
 - Kullanıcının sağladığı yeni ikon seti Belgeler, Görseller, Arşivler, Klasörler, Kısayollar ve genel dosya fallback görsellerine entegre edildi.

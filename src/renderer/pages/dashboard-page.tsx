@@ -85,7 +85,7 @@ export function DashboardPage({
             </div>
             <p className="mt-1 text-xs leading-5 text-zinc-400">{snapshot.settings.automaticMode
               ? snapshot.settings.organizationRules.scanExistingOnAutomaticEnable
-                ? language === 'tr' ? 'Açılırken mevcut desteklenen öğeleri tarar; ardından yeni gelenleri otomatik taşır.' : 'Scans existing supported items when enabled, then automatically moves new arrivals.'
+                ? language === 'tr' ? 'Başlangıçta ve radar açıldığında mevcut desteklenen öğeleri tarar; ardından yeni gelenleri otomatik taşır.' : 'Scans existing supported items at startup and when a radar is enabled, then automatically moves new arrivals.'
                 : language === 'tr' ? 'Yalnızca otomatik mod açıldıktan sonra yeni gelen öğeleri taşır.' : 'Moves only items that arrive after automatic mode is enabled.'
               : language === 'tr' ? 'Öğeler yalnızca önizleme ve onaydan sonra taşınır.' : 'Items move only after preview and approval.'}</p>
             <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-semibold">

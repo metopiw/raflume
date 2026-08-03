@@ -2,7 +2,7 @@ import { app, globalShortcut } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { shouldScanExistingItems } from '../shared/organization-settings';
+import { shouldScanExistingItems, shouldScanExistingItemsOnStartup } from '../shared/organization-settings';
 import type {
   AppSettings,
   AppSnapshot,
@@ -80,16 +80,18 @@ export class ApplicationController {
 
   public async initialize(): Promise<void> {
     try {
+      const settings = this.settingsStore.getAll();
       await this.historyStore.recoverPendingRecords();
       await this.clipboardImageStore.initialize();
       await this.windowManager.create();
-      await this.windowManager.syncDesktopWidget(this.settingsStore.getAll());
+      await this.windowManager.syncDesktopWidget(settings);
       this.trayManager.create();
       await this.fileWatcher.start();
       this.clipboardMonitor.start();
-      await this.registerHotkey(this.settingsStore.getAll().hotkey);
-      this.applyLoginItemSetting(this.settingsStore.getAll().launchAtStartup);
+      await this.registerHotkey(settings.hotkey);
+      this.applyLoginItemSetting(settings.launchAtStartup);
       await this.refreshAndBroadcast();
+      if (shouldScanExistingItemsOnStartup(settings)) this.scheduleExistingItemScan();
       log.info('Application controller initialized');
     } catch (error) {
       log.error('Could not initialize application controller', error);
@@ -154,7 +156,7 @@ export class ApplicationController {
         this.scheduleExistingItemScan();
         this.notify(
           'info',
-          this.localize('Otomatik düzenleme açıldı', 'Automatic organization enabled'),
+          this.localize('Mevcut öğe taraması planlandı', 'Existing item scan scheduled'),
           this.localize('Mevcut öğeler bir saniye sonra taranacak.', 'Existing items will be scanned in one second.'),
         );
       }

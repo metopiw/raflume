@@ -8,7 +8,7 @@
 
 [English](#english) · [Türkçe](#türkçe) · [Download / İndir](https://github.com/metopiw/raflume/releases/latest)
 
-![Version](https://img.shields.io/badge/version-1.6.3-7c3aed)
+![Version](https://img.shields.io/badge/version-1.6.5-7c3aed)
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078d4)
 ![License](https://img.shields.io/badge/license-MIT-22c55e)
 </div>
@@ -23,11 +23,12 @@ Raflume organizes your Desktop and Downloads without deleting files or overwriti
 
 - Separate shelves for documents, images, videos, installers, archives, folders, and shortcuts
 - Manual preview and explicit user approval
-- Optional automatic organization
+- Optional automatic organization with startup scanning for existing items
 - Collision-safe naming with no overwrites
 - Persistent movement journal and batch undo
 - Desktop, Downloads, and Windows Public Desktop support
-- System tray, global shortcut, and an independent desktop widget
+- System tray, global shortcut, and a native desktop-layer widget that stays visible with Win+D
+- Direct access to each shelf's latest item from the widget
 - On-device clipboard image history limited to the latest 12 images
 - Turkish and English interface
 
@@ -50,7 +51,7 @@ The distributed packages target Windows x64.
 Example verification in PowerShell:
 
 ```powershell
-Get-FileHash .\Raflume-Setup-1.6.3-x64.exe -Algorithm SHA256
+Get-FileHash .\Raflume-Setup-1.6.5-x64.exe -Algorithm SHA256
 ```
 
 ### Safety model
@@ -73,6 +74,8 @@ Requirements: Node.js 20+ and Windows.
 npm ci
 npm run dev
 ```
+
+The root `Raflume.exe` is a small taskbar launcher that starts the source build without showing a console window. Rebuild it with `npm run build:launcher`.
 
 Quality checks:
 
@@ -100,11 +103,12 @@ Raflume, dosyalarınızı silmeden veya mevcut dosyaların üzerine yazmadan Mas
 
 - Belgeler, görseller, videolar, kurulum dosyaları, arşivler, klasörler ve kısayollar için ayrı raflar
 - Manuel önizleme ve kullanıcı onayı
-- İsteğe bağlı otomatik düzenleme
+- Başlangıçta mevcut öğeleri de tarayabilen isteğe bağlı otomatik düzenleme
 - Çakışmasız adlandırma; mevcut dosyanın üzerine yazmama
 - Kalıcı işlem günlüğü ve toplu geri alma
 - Masaüstü, İndirilenler ve Windows Public Desktop desteği
-- Sistem tepsisi, global kısayol ve bağımsız masaüstü widget'ı
+- Sistem tepsisi, global kısayol ve Win+D sırasında görünür kalan yerel masaüstü katmanı widget'ı
+- Widget üzerinden her rafın son öğesine doğrudan erişim
 - Son 12 pano görselini yalnızca cihazda tutan yerel geçmiş
 - Türkçe ve İngilizce arayüz
 
@@ -127,7 +131,7 @@ Dağıtımlar Windows x64 içindir.
 PowerShell ile doğrulama örneği:
 
 ```powershell
-Get-FileHash .\Raflume-Setup-1.6.3-x64.exe -Algorithm SHA256
+Get-FileHash .\Raflume-Setup-1.6.5-x64.exe -Algorithm SHA256
 ```
 
 ### Güvenlik yaklaşımı
@@ -150,6 +154,8 @@ Gereksinimler: Node.js 20+ ve Windows.
 npm ci
 npm run dev
 ```
+
+Proje kökündeki küçük `Raflume.exe`, konsol penceresi göstermeden kaynak sürümü başlatır ve görev çubuğuna sabitlenebilir. Yeniden üretmek için `npm run build:launcher` komutunu çalıştırın.
 
 Kalite kontrolleri:
 

@@ -127,20 +127,34 @@ function WidgetShelfList({ shelves, language }: { shelves: DestinationShelf[]; l
       {sortedShelves.map((shelf) => {
         const isEmpty = shelf.fileCount === 0;
         return (
-          <button
+          <div
             key={shelf.id}
-            type="button"
-            onClick={() => void window.desktopOrganizer.openFolder(shelf.directoryPath)}
             className={cn('widget-shelf-row group flex w-full min-w-0 items-center gap-3 text-left', isEmpty && 'is-empty')}
           >
-            <CategoryArtwork category={shelf.category} empty={isEmpty} className="h-9 w-9 shrink-0 text-zinc-100" />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[12px] font-semibold text-zinc-50">{categoryLabel(shelf.category, language)}</span>
-              <span className="mt-0.5 block truncate text-[10px] text-zinc-400">{isEmpty ? copy[language].shelfEmpty : shelf.latestFileName ?? shelf.directoryPath}</span>
-            </span>
-            <span className="shrink-0 text-[11px] tabular-nums text-zinc-300">{shelf.fileCount}</span>
-            <FolderOpen size={13} className="shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-100" />
-          </button>
+            <button
+              type="button"
+              disabled={!shelf.latestItemPath}
+              onClick={() => shelf.latestItemPath && void window.desktopOrganizer.openFile(shelf.latestItemPath)}
+              className="widget-shelf-open flex min-w-0 flex-1 items-center gap-3 text-left"
+              title={shelf.latestFileName ? (language === 'tr' ? `Son öğeyi aç: ${shelf.latestFileName}` : `Open latest item: ${shelf.latestFileName}`) : copy[language].shelfEmpty}
+            >
+              <CategoryArtwork category={shelf.category} empty={isEmpty} className="h-9 w-9 shrink-0 text-zinc-100" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12px] font-semibold text-zinc-50">{categoryLabel(shelf.category, language)}</span>
+                <span className="mt-0.5 block truncate text-[10px] text-zinc-400">{isEmpty ? copy[language].shelfEmpty : shelf.latestFileName ?? shelf.directoryPath}</span>
+              </span>
+              <span className="shrink-0 text-[11px] tabular-nums text-zinc-300">{shelf.fileCount}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => void window.desktopOrganizer.openFolder(shelf.directoryPath)}
+              className="widget-shelf-folder-button grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/[.07] hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white/70"
+              title={language === 'tr' ? 'Raf klasörünü aç' : 'Open shelf folder'}
+              aria-label={language === 'tr' ? `${categoryLabel(shelf.category, language)} klasörünü aç` : `Open ${categoryLabel(shelf.category, language)} folder`}
+            >
+              <FolderOpen size={14} />
+            </button>
+          </div>
         );
       })}
     </div>

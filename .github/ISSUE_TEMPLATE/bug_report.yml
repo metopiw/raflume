@@ -1,0 +1,51 @@
+name: Hata bildirimi / Bug report
+description: Tekrarlanabilir bir Raflume hatasını bildirin.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Güvenlik açıklarını herkese açık bildirmeyin; Security sekmesini kullanın.
+  - type: input
+    id: version
+    attributes:
+      label: Raflume sürümü / version
+      placeholder: 1.6.3
+    validations:
+      required: true
+  - type: dropdown
+    id: package
+    attributes:
+      label: Paket / package
+      options:
+        - Setup EXE
+        - Portable folder ZIP
+        - Source / development
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Sorun / problem
+      description: Ne oldu ve ne olmasını bekliyordunuz?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Tekrarlama adımları / reproduction steps
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Ek bilgi / additional context
+      description: Windows sürümü, ekran görüntüsü ve kişisel bilgi içermeyen ilgili loglar.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Gizlilik / privacy
+      options:
+        - label: Paylaştığım yolları, ekran görüntülerini ve logları kişisel bilgilerden temizledim.
+          required: true

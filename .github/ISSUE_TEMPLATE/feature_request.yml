@@ -1,0 +1,26 @@
+name: Özellik isteği / Feature request
+description: Raflume için bir iyileştirme önerin.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: İhtiyaç / need
+      description: Hangi sorunu çözmek istiyorsunuz?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Öneri / proposal
+      description: Beklediğiniz davranışı anlatın.
+    validations:
+      required: true
+  - type: checkboxes
+    id: guarantees
+    attributes:
+      label: Güvenlik garantileri / safety guarantees
+      options:
+        - label: Öneri dosya silme veya mevcut dosyanın üzerine yazma gerektirmiyor.
+          required: true

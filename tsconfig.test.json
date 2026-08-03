@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "node"
+    ],
+    "rootDir": ".",
+    "outDir": ".test-dist"
+  },
+  "include": [
+    "tests/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/main/file-move-engine.ts",
+    "src/main/organizer.ts",
+    "src/main/logger.ts",
+    "src/renderer/lib/appearance.ts"
+  ]
+}

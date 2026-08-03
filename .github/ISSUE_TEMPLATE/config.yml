@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Güvenlik açığı / Security vulnerability
+    url: https://github.com/metopiw/raflume/security/advisories/new
+    about: Güvenlik sorunlarını özel olarak bildirin / Report security issues privately

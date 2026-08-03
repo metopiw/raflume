@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/app-icon-128.png" alt="Raflume logo" width="112" />
+  <img src="assets/raflume-brand-icon.png" alt="Raflume brand icon" width="280" />
 
 # Raflume
 

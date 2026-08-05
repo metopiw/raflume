@@ -23,6 +23,10 @@ let snapshot: AppSnapshot = {
     accentTheme: 'violet',
     interfaceFont: 'segoe-variable',
     desktopWidget: { enabled: true, corner: 'top-right', width: 420, height: 560, opacity: 0.74, design: 'glass', colorTheme: 'violet', font: 'segoe-variable' },
+    exclusions: [
+      { path: 'C:/Users/Demo/Desktop/keep-here.pdf', name: 'keep-here.pdf', kind: 'file' },
+      { path: 'C:/Users/Demo/Downloads/Proje', name: 'Proje', kind: 'directory' },
+    ],
   },
   recentFiles: [
     { id: '1', path: 'C:/Users/Demo/Downloads/Tools.json', name: 'Tools.json', extension: '.json', size: 48_900, modifiedAt: iso(60), discoveredAt: iso(60), source: 'downloads', category: 'other', itemKind: 'file' },
@@ -124,6 +128,9 @@ const api: DesktopOrganizerApi = {
   copyClipboardImage: async () => ({ success: true, message: 'Copied.' }),
   saveClipboardImage: async () => ({ success: true, message: 'Saved.' }),
   clearClipboardImages: async () => ({ success: true, message: 'Cleared.' }),
+  addExclusionFiles: async () => snapshot,
+  addExclusionFolders: async () => snapshot,
+  removeExclusion: async () => snapshot,
   onSnapshotUpdated: (callback) => {
     snapshotListeners.add(callback);
     return () => snapshotListeners.delete(callback);

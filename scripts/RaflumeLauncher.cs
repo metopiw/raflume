@@ -9,8 +9,8 @@ using System.Windows.Forms;
 [assembly: AssemblyCompany("mertpivvo")]
 [assembly: AssemblyProduct("Raflume")]
 [assembly: AssemblyCopyright("© mertpivvo")]
-[assembly: AssemblyVersion("1.6.5.0")]
-[assembly: AssemblyFileVersion("1.6.5.0")]
+[assembly: AssemblyVersion("1.6.6.0")]
+[assembly: AssemblyFileVersion("1.6.6.0")]
 
 internal static class RaflumeLauncher
 {

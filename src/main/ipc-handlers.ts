@@ -201,4 +201,31 @@ export function registerIpcHandlers(controller: ApplicationController): void {
       throw error;
     }
   });
+
+  ipcMain.handle(IPC_CHANNELS.EXCLUSIONS_ADD_FILES, async () => {
+    try {
+      return await controller.addExclusionFiles();
+    } catch (error) {
+      log.error('IPC add exclusion files failed', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.EXCLUSIONS_ADD_FOLDERS, async () => {
+    try {
+      return await controller.addExclusionFolders();
+    } catch (error) {
+      log.error('IPC add exclusion folders failed', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.EXCLUSIONS_REMOVE, async (_event, candidate: unknown) => {
+    try {
+      return await controller.removeExclusion(validateFilePath(candidate));
+    } catch (error) {
+      log.error('IPC remove exclusion failed', error);
+      throw error;
+    }
+  });
 }

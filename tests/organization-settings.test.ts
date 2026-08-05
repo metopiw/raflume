@@ -16,6 +16,7 @@ const base: AppSettings = {
   accentTheme: 'violet',
   interfaceFont: 'segoe-variable',
   desktopWidget: { enabled: false, corner: 'top-right', width: 420, height: 560, opacity: .74, design: 'glass', colorTheme: 'violet', font: 'segoe-variable' },
+  exclusions: [],
 };
 
 test('scans existing items when automatic mode is enabled', () => {

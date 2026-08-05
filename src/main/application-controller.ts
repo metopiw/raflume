@@ -1,11 +1,15 @@
-import { app, globalShortcut } from 'electron';
+import { app, dialog, globalShortcut, type OpenDialogOptions } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { buildExclusionAdditions } from '../shared/exclusions';
+import { pathsEqual } from '../shared/path-utils';
 import { shouldScanExistingItems, shouldScanExistingItemsOnStartup } from '../shared/organization-settings';
 import type {
   AppSettings,
   AppSnapshot,
+  ExclusionItem,
+  ExclusionKind,
   NotificationKind,
   OperationResult,
   OrganizationPreview,
@@ -170,7 +174,8 @@ export class ApplicationController {
 
   public async previewOrganization(): Promise<OrganizationPreview> {
     try {
-      return await this.organizer.previewFolders(this.getEnabledLocations(), this.settingsStore.getAll().organizationRules);
+      const settings = this.settingsStore.getAll();
+      return await this.organizer.previewFolders(this.getEnabledLocations(), settings.organizationRules, settings.exclusions);
     } catch (error) {
       log.error('Could not preview organization', error);
       throw error;
@@ -179,7 +184,8 @@ export class ApplicationController {
 
   public async organizeNow(): Promise<OperationResult> {
     try {
-      const result = await this.organizer.organizeFolders(this.getEnabledLocations(), 'manual', this.settingsStore.getAll().organizationRules);
+      const settings = this.settingsStore.getAll();
+      const result = await this.organizer.organizeFolders(this.getEnabledLocations(), 'manual', settings.organizationRules, settings.exclusions);
       this.notify(
         result.success ? 'success' : 'error',
         this.localize('Düzenleme tamamlandı', 'Organization finished'),
@@ -255,6 +261,64 @@ export class ApplicationController {
     }
   }
 
+  public async addExclusionFiles(): Promise<AppSnapshot> {
+    return await this.addExclusions('file');
+  }
+
+  public async addExclusionFolders(): Promise<AppSnapshot> {
+    return await this.addExclusions('directory');
+  }
+
+  public async removeExclusion(itemPath: string): Promise<AppSnapshot> {
+    try {
+      const current = this.settingsStore.getAll();
+      const next = current.exclusions.filter((item) => !pathsEqual(item.path, itemPath));
+      if (next.length === current.exclusions.length) return await this.getSnapshot();
+      return await this.updateSettings({ exclusions: next });
+    } catch (error) {
+      log.error('Could not remove exclusion', { itemPath, error });
+      throw error;
+    }
+  }
+
+  private async addExclusions(kind: ExclusionKind): Promise<AppSnapshot> {
+    try {
+      const parent = this.windowManager.getWindow();
+      const options: OpenDialogOptions = kind === 'directory'
+        ? {
+            title: this.localize('Hariç tutulacak klasörleri seç', 'Select folders to exclude'),
+            buttonLabel: this.localize('Hariç tut', 'Exclude'),
+            properties: ['openDirectory', 'multiSelections'],
+          }
+        : {
+            title: this.localize('Hariç tutulacak dosyaları seç', 'Select files to exclude'),
+            buttonLabel: this.localize('Hariç tut', 'Exclude'),
+            properties: ['openFile', 'multiSelections'],
+            filters: [{ name: this.localize('Tüm dosyalar', 'All files'), extensions: ['*'] }],
+          };
+      const result = parent
+        ? await dialog.showOpenDialog(parent, options)
+        : await dialog.showOpenDialog(options);
+      if (result.canceled || result.filePaths.length === 0) return await this.getSnapshot();
+
+      const current = this.settingsStore.getAll();
+      const watchedRoots = [this.watchedPaths.desktop, this.watchedPaths.downloads, ...this.additionalDesktopPaths];
+      const added: ExclusionItem[] = buildExclusionAdditions(result.filePaths, current.exclusions, watchedRoots, kind);
+      if (added.length === 0) return await this.getSnapshot();
+
+      const snapshot = await this.updateSettings({ exclusions: [...current.exclusions, ...added] });
+      this.notify(
+        'success',
+        this.localize('Hariç tutulanlar güncellendi', 'Exclusions updated'),
+        this.localize(`${added.length} öğe hariç tutulanlara eklendi.`, `${added.length} item(s) added to exclusions.`),
+      );
+      return snapshot;
+    } catch (error) {
+      log.error('Could not add exclusions', { kind, error });
+      throw error;
+    }
+  }
+
   private scheduleExistingItemScan(): void {
     this.cancelExistingItemScan();
     this.existingScanTimer = setTimeout(() => {
@@ -273,7 +337,7 @@ export class ApplicationController {
     try {
       const settings = this.settingsStore.getAll();
       if (!settings.automaticMode || !settings.organizationRules.scanExistingOnAutomaticEnable) return;
-      const result = await this.organizer.organizeFolders(this.getEnabledLocations(), 'automatic', settings.organizationRules);
+      const result = await this.organizer.organizeFolders(this.getEnabledLocations(), 'automatic', settings.organizationRules, settings.exclusions);
       const message = this.localizeResult(result);
       this.notify(
         result.success ? 'success' : 'error',
@@ -382,7 +446,7 @@ export class ApplicationController {
     const movesToday = history.filter((record) => record.status !== 'failed' && record.movedAt.startsWith(today)).length;
     const enabledFolderCount = Number(settings.watchedLocations.desktop) + Number(settings.watchedLocations.downloads);
     const destinationShelves = await scanDestinationShelves(this.watchedPaths, this.additionalDesktopPaths);
-    const organizationPreview = await this.organizer.previewFolders(this.getEnabledLocations(), settings.organizationRules);
+    const organizationPreview = await this.organizer.previewFolders(this.getEnabledLocations(), settings.organizationRules, settings.exclusions);
     const clipboardImages = await this.clipboardImageStore.getAll();
 
     return {

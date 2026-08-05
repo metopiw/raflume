@@ -11,6 +11,13 @@ export type ApplicationFont = 'segoe-variable' | 'verdana' | 'tahoma' | 'arial' 
 export type DesktopWidgetCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 export type DesktopWidgetDesign = 'glass' | 'minimal' | 'shelf';
 export type DesktopWidgetFont = 'segoe-variable' | 'tahoma' | 'verdana' | 'arial' | 'georgia';
+export type ExclusionKind = 'file' | 'directory';
+
+export interface ExclusionItem {
+  path: string;
+  name: string;
+  kind: ExclusionKind;
+}
 
 export interface DesktopWidgetSettings {
   enabled: boolean;
@@ -47,6 +54,7 @@ export interface AppSettings {
   accentTheme: AccentTheme;
   interfaceFont: ApplicationFont;
   desktopWidget: DesktopWidgetSettings;
+  exclusions: ExclusionItem[];
 }
 
 export interface WatchedFile {
@@ -188,6 +196,9 @@ export interface DesktopOrganizerApi {
   copyClipboardImage: (imageId: string) => Promise<OperationResult>;
   saveClipboardImage: (imageId: string) => Promise<OperationResult>;
   clearClipboardImages: () => Promise<OperationResult>;
+  addExclusionFiles: () => Promise<AppSnapshot>;
+  addExclusionFolders: () => Promise<AppSnapshot>;
+  removeExclusion: (itemPath: string) => Promise<AppSnapshot>;
   onSnapshotUpdated: (callback: (snapshot: AppSnapshot) => void) => () => void;
   onNotification: (callback: (notification: NotificationPayload) => void) => () => void;
   onPreviewRequested: (callback: () => void) => () => void;

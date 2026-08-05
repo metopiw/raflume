@@ -37,6 +37,15 @@ Teslim ZIP'i oluşturulduktan sonra ayrı klasöre çıkarıp aynı üç kontrol
 - Kullanıcı masaüstüne ek olarak Windows `Public Desktop` taranabilir; ortak öğelerin hedefi kullanıcının kendi masaüstü raflarıdır. Yetki hatasında dosyaya zarar verme, hatayı günlüğe yaz.
 - Windows kilit hatalarında yalnızca sınırlı yeniden deneme yap; sonsuz döngü kurma.
 
+## Hariç Tutulanlar
+
+- Hariç tutma kuralı ortak düzenleme katmanında uygulanır; yalnızca arayüzde filtreleme yapma.
+- Hariç tutulan dosya/kısayol yalnızca kendi yolunu, hariç tutulan klasör kendisini ve tüm alt yollarını kapsar.
+- Yol karşılaştırması büyük/küçük harf ve ayraç/sondaki `\` farklarını normalleştirir; `C:\test` ile `C:\test-2` karıştırılmaz.
+- Aynı yol ikinci kez eklenemez; Masaüstü/İndirilenler kökünün tamamı hariç tutulamaz (kaynak açma/kapama ayarı kullanılır).
+- Hariç tutulan öğeler manuel önizleme, manuel/otomatik düzenleme, başlangıç taraması ve watcher olaylarında atlanır; işlem günlüğüne hareket olarak yazılmaz.
+- Kaldırma işlemi gerçek dosyayı diskten silmez; liste ayarlarda kalıcı saklanır ve değişiklikler yeniden başlatmadan aktif olur.
+
 ## Otomatik düzenleme
 
 - Anahtar ilk tıklamada arayüzde anında durum değiştirmelidir.

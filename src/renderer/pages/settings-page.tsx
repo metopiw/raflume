@@ -1,5 +1,8 @@
 import {
   BellRing,
+  FilePlus2,
+  FileX2,
+  FolderPlus,
   FolderTree,
   Images,
   Keyboard,
@@ -11,6 +14,7 @@ import {
   Radar,
   ScanSearch,
   ShieldCheck,
+  Trash2,
   Type,
 } from 'lucide-react';
 import type { AppLanguage, AppSettings, DesktopWidgetCorner } from '../../shared/types';
@@ -30,6 +34,9 @@ interface SettingsPageProps {
   settings: AppSettings;
   language: AppLanguage;
   onUpdate: (patch: Partial<AppSettings>) => void;
+  onAddExclusionFiles: () => void;
+  onAddExclusionFolders: () => void;
+  onRemoveExclusion: (itemPath: string) => void;
 }
 
 function SettingRow({ icon, title, description, control }: { icon: JSX.Element; title: string; description: string; control: JSX.Element }): JSX.Element {
@@ -57,7 +64,7 @@ function SettingsSection({ title, description, children }: { title: string; desc
   );
 }
 
-export function SettingsPage({ settings, language, onUpdate }: SettingsPageProps): JSX.Element {
+export function SettingsPage({ settings, language, onUpdate, onAddExclusionFiles, onAddExclusionFolders, onRemoveExclusion }: SettingsPageProps): JSX.Element {
   const t = copy[language];
   const widget = settings.desktopWidget;
   const rules = settings.organizationRules;
@@ -93,6 +100,30 @@ export function SettingsPage({ settings, language, onUpdate }: SettingsPageProps
       <SettingsSection title={t.locations} description={t.locationsHelp}>
         <SettingRow icon={<Radar size={18} />} title={t.watchDesktop} description={t.watchDesktopDescription} control={<Switch checked={settings.watchedLocations.desktop} onCheckedChange={(checked) => onUpdate({ watchedLocations: { ...settings.watchedLocations, desktop: checked } })} label={t.watchDesktop} />} />
         <SettingRow icon={<Radar size={18} />} title={t.watchDownloads} description={t.watchDownloadsDescription} control={<Switch checked={settings.watchedLocations.downloads} onCheckedChange={(checked) => onUpdate({ watchedLocations: { ...settings.watchedLocations, downloads: checked } })} label={t.watchDownloads} />} />
+      </SettingsSection>
+
+      <SettingsSection title={t.exclusionsTitle} description={t.exclusionsDescription}>
+        <div className="flex flex-wrap gap-2 py-3">
+          <button type="button" onClick={onAddExclusionFiles} className="inline-flex items-center gap-2 rounded-xl bg-white/[.06] px-4 py-2.5 text-xs font-semibold text-zinc-100 transition-colors hover:bg-white/[.1]"><FilePlus2 size={15} />{t.addExclusionFile}</button>
+          <button type="button" onClick={onAddExclusionFolders} className="inline-flex items-center gap-2 rounded-xl bg-white/[.06] px-4 py-2.5 text-xs font-semibold text-zinc-100 transition-colors hover:bg-white/[.1]"><FolderPlus size={15} />{t.addExclusionFolder}</button>
+        </div>
+        {settings.exclusions.length === 0 ? (
+          <p className="pb-3 text-xs text-zinc-500">{t.exclusionsEmpty}</p>
+        ) : (
+          <ul className="divide-y divide-white/[.05]">
+            {settings.exclusions.map((item) => (
+              <li key={item.path} className="flex items-center gap-3 py-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/[.045] text-zinc-300"><FileX2 size={16} /></div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold text-white">{item.name}</div>
+                  <div className="mt-0.5 truncate text-xs text-zinc-400" title={item.path}>{item.path}</div>
+                </div>
+                <span className="shrink-0 rounded-full bg-white/[.05] px-2.5 py-1 text-[10px] font-semibold text-zinc-400">{item.kind === 'directory' ? t.exclusionFolder : t.exclusionFile}</span>
+                <button type="button" onClick={() => onRemoveExclusion(item.path)} aria-label={t.removeExclusion} title={t.removeExclusion} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/[.07] hover:text-zinc-100"><Trash2 size={14} /></button>
+              </li>
+            ))}
+          </ul>
+        )}
       </SettingsSection>
 
       <SettingsSection title={language === 'tr' ? 'Ana arayüz görünümü' : 'Main interface appearance'} description={language === 'tr' ? 'Renk yalnızca vurgu elemanlarını değiştirir. Beyaz ve gri metinler her temada nötr ve opak kalır.' : 'Color changes only accent elements. White and gray text stays neutral and opaque in every theme.'}>
@@ -230,7 +261,7 @@ export function SettingsPage({ settings, language, onUpdate }: SettingsPageProps
       <section className="about-strip flex flex-col gap-4 rounded-[24px] p-5 sm:flex-row sm:items-center">
         <BrandMark className="h-14 w-14 shrink-0" />
         <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-white">{t.aboutTitle}</div><p className="mt-1.5 text-xs leading-5 text-zinc-400">{t.aboutDescription}</p></div>
-        <div className="text-right text-[11px] text-zinc-500"><div>Raflume 1.6.5</div><div className="mt-1">MIT · by mertpivvo</div></div>
+        <div className="text-right text-[11px] text-zinc-500"><div>Raflume 1.6.6</div><div className="mt-1">MIT · by mertpivvo</div></div>
       </section>
     </div>
   );

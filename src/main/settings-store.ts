@@ -1,5 +1,6 @@
 import Store from 'electron-store';
 import type { ApplicationFont, AppSettings, DesktopWidgetFont } from '../shared/types';
+import { normalizeExclusions } from '../shared/exclusions';
 import { clampWidgetOpacity, clampWidgetSize } from '../shared/widget-size';
 import log from './logger';
 
@@ -32,6 +33,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     colorTheme: 'violet',
     font: 'segoe-variable',
   },
+  exclusions: [],
 };
 
 const SUPPORTED_APP_FONTS: ReadonlySet<ApplicationFont> = new Set(['segoe-variable', 'verdana', 'tahoma', 'arial', 'georgia']);
@@ -100,6 +102,7 @@ export class SettingsStore {
         colorTheme: desktopWidget.colorTheme ?? DEFAULT_SETTINGS.desktopWidget.colorTheme,
         font: normalizeWidgetFont(desktopWidget.font),
       },
+      exclusions: normalizeExclusions(this.store.get('exclusions')),
     };
   }
 
@@ -121,6 +124,7 @@ export class SettingsStore {
           ...current.desktopWidget,
           ...(patch.desktopWidget ?? {}),
         },
+        exclusions: patch.exclusions ? normalizeExclusions(patch.exclusions) : current.exclusions,
       };
       this.store.set(next);
       log.info('Settings updated', { keys: Object.keys(patch) });

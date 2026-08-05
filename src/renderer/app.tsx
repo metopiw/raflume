@@ -152,6 +152,30 @@ export function App(): JSX.Element {
     }
   };
 
+  const addExclusionFiles = async (): Promise<void> => {
+    try {
+      setSnapshot(await window.desktopOrganizer.addExclusionFiles());
+    } catch (error) {
+      addLocalError(error);
+    }
+  };
+
+  const addExclusionFolders = async (): Promise<void> => {
+    try {
+      setSnapshot(await window.desktopOrganizer.addExclusionFolders());
+    } catch (error) {
+      addLocalError(error);
+    }
+  };
+
+  const removeExclusion = async (itemPath: string): Promise<void> => {
+    try {
+      setSnapshot(await window.desktopOrganizer.removeExclusion(itemPath));
+    } catch (error) {
+      addLocalError(error);
+    }
+  };
+
   let content: JSX.Element;
   if (!snapshot) {
     content = <div className="grid h-full place-items-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-white" /></div>;
@@ -160,7 +184,16 @@ export function App(): JSX.Element {
   } else if (view === 'history') {
     content = <HistoryPage snapshot={snapshot} language={language} onUndo={() => void undoLastBatch()} />;
   } else if (view === 'settings') {
-    content = <SettingsPage settings={snapshot.settings} language={language} onUpdate={(patch) => void updateSettings(patch)} />;
+    content = (
+      <SettingsPage
+        settings={snapshot.settings}
+        language={language}
+        onUpdate={(patch) => void updateSettings(patch)}
+        onAddExclusionFiles={() => void addExclusionFiles()}
+        onAddExclusionFolders={() => void addExclusionFolders()}
+        onRemoveExclusion={(itemPath) => void removeExclusion(itemPath)}
+      />
+    );
   } else {
     content = (
       <DashboardPage

@@ -8,7 +8,7 @@
 
 [English](#english) · [Türkçe](#türkçe) · [Download / İndir](https://github.com/metopiw/raflume/releases/latest)
 
-![Version](https://img.shields.io/badge/version-1.6.5-7c3aed)
+![Version](https://img.shields.io/badge/version-1.6.6-7c3aed)
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078d4)
 ![License](https://img.shields.io/badge/license-MIT-22c55e)
 </div>
@@ -27,6 +27,7 @@ Raflume organizes your Desktop and Downloads without deleting files or overwriti
 - Collision-safe naming with no overwrites
 - Persistent movement journal and batch undo
 - Desktop, Downloads, and Windows Public Desktop support
+- Exclusions: keep specific files, shortcuts, and folders out of every organization path
 - System tray, global shortcut, and a native desktop-layer widget that stays visible with Win+D
 - Direct access to each shelf's latest item from the widget
 - On-device clipboard image history limited to the latest 12 images
@@ -51,7 +52,7 @@ The distributed packages target Windows x64.
 Example verification in PowerShell:
 
 ```powershell
-Get-FileHash .\Raflume-Setup-1.6.5-x64.exe -Algorithm SHA256
+Get-FileHash .\Raflume-Setup-1.6.6-x64.exe -Algorithm SHA256
 ```
 
 ### Safety model
@@ -107,6 +108,7 @@ Raflume, dosyalarınızı silmeden veya mevcut dosyaların üzerine yazmadan Mas
 - Çakışmasız adlandırma; mevcut dosyanın üzerine yazmama
 - Kalıcı işlem günlüğü ve toplu geri alma
 - Masaüstü, İndirilenler ve Windows Public Desktop desteği
+- Hariç Tutulanlar: belirli dosya, kısayol ve klasörleri tüm düzenleme yollarının dışında tutma
 - Sistem tepsisi, global kısayol ve Win+D sırasında görünür kalan yerel masaüstü katmanı widget'ı
 - Widget üzerinden her rafın son öğesine doğrudan erişim
 - Son 12 pano görselini yalnızca cihazda tutan yerel geçmiş
@@ -131,7 +133,7 @@ Dağıtımlar Windows x64 içindir.
 PowerShell ile doğrulama örneği:
 
 ```powershell
-Get-FileHash .\Raflume-Setup-1.6.5-x64.exe -Algorithm SHA256
+Get-FileHash .\Raflume-Setup-1.6.6-x64.exe -Algorithm SHA256
 ```
 
 ### Güvenlik yaklaşımı

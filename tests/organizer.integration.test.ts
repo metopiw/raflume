@@ -155,3 +155,73 @@ test('moves shared-desktop items into the primary desktop shelves', async () => 
     await fs.remove(root);
   }
 });
+
+test('excluded files, shortcuts, and folders are skipped in preview and organization', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'raflume-exclusions-'));
+  try {
+    await fs.writeFile(path.join(root, 'keep.pdf'), 'pdf', 'utf8');
+    await fs.writeFile(path.join(root, 'move.pdf'), 'pdf', 'utf8');
+    await fs.writeFile(path.join(root, 'Browser.lnk'), 'shortcut', 'utf8');
+    await fs.ensureDir(path.join(root, 'Project'));
+    await fs.writeFile(path.join(root, 'Project', 'note.txt'), 'inside', 'utf8');
+    await fs.ensureDir(path.join(root, 'Belgeler'));
+
+    const history = new MemoryHistory();
+    const organizer = new FileOrganizer(history);
+    const rules: OrganizationRules = {
+      scanExistingOnAutomaticEnable: true,
+      includeFolders: true,
+      includeShortcuts: true,
+    };
+    const locations = [{ source: 'desktop' as const, path: root }];
+    const exclusions = [
+      { path: path.join(root, 'keep.pdf'), name: 'keep.pdf', kind: 'file' as const },
+      { path: path.join(root, 'Browser.lnk'), name: 'Browser.lnk', kind: 'file' as const },
+      { path: path.join(root, 'Project'), name: 'Project', kind: 'directory' as const },
+    ];
+
+    const preview = await organizer.previewFolders(locations, rules, exclusions);
+    assert.equal(preview.movableCount, 1);
+    assert.equal(preview.items[0]?.fileName, 'move.pdf');
+    assert.equal(preview.items.some((item) => item.fileName === 'keep.pdf'), false);
+    assert.equal(preview.items.some((item) => item.fileName === 'Browser.lnk'), false);
+    assert.equal(preview.items.some((item) => item.fileName === 'Project'), false);
+
+    const result = await organizer.organizeFolders(locations, 'manual', rules, exclusions);
+    assert.equal(result.success, true);
+    assert.equal(result.movedCount, 1);
+    assert.equal(await fs.pathExists(path.join(root, 'move.pdf')), false);
+    assert.equal(await fs.pathExists(path.join(root, 'Belgeler', 'move.pdf')), true);
+    assert.equal(await fs.pathExists(path.join(root, 'keep.pdf')), true);
+    assert.equal(await fs.pathExists(path.join(root, 'Browser.lnk')), true);
+    assert.equal(await fs.pathExists(path.join(root, 'Project', 'note.txt')), true);
+    assert.equal(history.records.filter((record) => record.status === 'completed').length, 1);
+  } finally {
+    await fs.remove(root);
+  }
+});
+
+test('excluded items are skipped even when triggered directly', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'raflume-exclusion-direct-'));
+  try {
+    await fs.writeFile(path.join(root, 'keep.pdf'), 'pdf', 'utf8');
+
+    const history = new MemoryHistory();
+    const organizer = new FileOrganizer(history);
+    const rules: OrganizationRules = {
+      scanExistingOnAutomaticEnable: true,
+      includeFolders: false,
+      includeShortcuts: false,
+    };
+    const exclusions = [{ path: path.join(root, 'keep.pdf'), name: 'keep.pdf', kind: 'file' as const }];
+
+    const result = await organizer.organizeFile(path.join(root, 'keep.pdf'), 'desktop', 'automatic', rules, undefined, undefined, exclusions);
+    assert.equal(result.success, true);
+    assert.equal(result.movedCount, 0);
+    assert.equal(result.skippedCount, 1);
+    assert.equal(await fs.pathExists(path.join(root, 'keep.pdf')), true);
+    assert.equal(history.records.length, 0);
+  } finally {
+    await fs.remove(root);
+  }
+});

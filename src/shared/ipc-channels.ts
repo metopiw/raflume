@@ -21,4 +21,7 @@ export const IPC_CHANNELS = {
   CLIPBOARD_IMAGE_COPY: 'clipboard-image:copy',
   CLIPBOARD_IMAGE_SAVE: 'clipboard-image:save',
   CLIPBOARD_IMAGE_CLEAR: 'clipboard-image:clear',
+  EXCLUSIONS_ADD_FILES: 'exclusions:add-files',
+  EXCLUSIONS_ADD_FOLDERS: 'exclusions:add-folders',
+  EXCLUSIONS_REMOVE: 'exclusions:remove',
 } as const;

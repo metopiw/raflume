@@ -1,8 +1,10 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { randomUUID } from 'node:crypto';
+import { isPathExcluded } from '../shared/exclusions';
 import { CATEGORY_FOLDER_NAMES, getOrganizableCategory, isCategoryFolder, isProtectedSystemItem } from '../shared/file-categories';
 import type {
+  ExclusionItem,
   MoveTrigger,
   MovedItem,
   MovementRecord,
@@ -46,7 +48,7 @@ interface ResolvedOrganizableItem {
 export class FileOrganizer {
   public constructor(private readonly historyStore: MovementHistoryRepository) {}
 
-  public async previewFolders(locations: OrganizeLocation[], rules: OrganizationRules): Promise<OrganizationPreview> {
+  public async previewFolders(locations: OrganizeLocation[], rules: OrganizationRules, exclusions: readonly ExclusionItem[] = []): Promise<OrganizationPreview> {
     const items: OrganizationPreviewItem[] = [];
     let untouchedCount = 0;
 
@@ -55,13 +57,17 @@ export class FileOrganizer {
         try {
           const entries = await fs.readdir(location.path, { withFileTypes: true });
           for (const entry of entries) {
+            const sourcePath = path.join(location.path, entry.name);
+            if (isPathExcluded(sourcePath, exclusions)) {
+              untouchedCount += 1;
+              continue;
+            }
             const resolved = this.resolveEntry(entry.name, entry.isFile(), entry.isDirectory(), rules);
             if (!resolved) {
               untouchedCount += 1;
               continue;
             }
 
-            const sourcePath = path.join(location.path, entry.name);
             const destinationDirectory = path.join(location.destinationRoot ?? location.path, CATEGORY_FOLDER_NAMES[resolved.category]);
             const proposedTargetPath = await resolveAvailablePath(destinationDirectory, entry.name);
             items.push({
@@ -95,7 +101,7 @@ export class FileOrganizer {
     }
   }
 
-  public async organizeFolders(locations: OrganizeLocation[], trigger: MoveTrigger, rules: OrganizationRules): Promise<OrganizeBatchResult> {
+  public async organizeFolders(locations: OrganizeLocation[], trigger: MoveTrigger, rules: OrganizationRules, exclusions: readonly ExclusionItem[] = []): Promise<OrganizeBatchResult> {
     const batchId = randomUUID();
     let movedCount = 0;
     let skippedCount = 0;
@@ -107,19 +113,25 @@ export class FileOrganizer {
         try {
           const entries = await fs.readdir(location.path, { withFileTypes: true });
           for (const entry of entries) {
+            const itemPath = path.join(location.path, entry.name);
+            if (isPathExcluded(itemPath, exclusions)) {
+              skippedCount += 1;
+              continue;
+            }
             const resolved = this.resolveEntry(entry.name, entry.isFile(), entry.isDirectory(), rules);
             if (!resolved) {
               skippedCount += 1;
               continue;
             }
             const result = await this.organizeItem(
-              path.join(location.path, entry.name),
+              itemPath,
               location.source,
               trigger,
               resolved.itemKind,
               rules,
               batchId,
               location.destinationRoot,
+              exclusions,
             );
             if (result.success && result.movedCount === 1) {
               movedCount += 1;
@@ -160,8 +172,9 @@ export class FileOrganizer {
     rules: OrganizationRules,
     requestedBatchId?: string,
     destinationRoot?: string,
+    exclusions: readonly ExclusionItem[] = [],
   ): Promise<OperationResult> {
-    return await this.organizeItem(filePath, source, trigger, 'file', rules, requestedBatchId, destinationRoot);
+    return await this.organizeItem(filePath, source, trigger, 'file', rules, requestedBatchId, destinationRoot, exclusions);
   }
 
   public async organizeDirectory(
@@ -171,8 +184,9 @@ export class FileOrganizer {
     rules: OrganizationRules,
     requestedBatchId?: string,
     destinationRoot?: string,
+    exclusions: readonly ExclusionItem[] = [],
   ): Promise<OperationResult> {
-    return await this.organizeItem(directoryPath, source, trigger, 'directory', rules, requestedBatchId, destinationRoot);
+    return await this.organizeItem(directoryPath, source, trigger, 'directory', rules, requestedBatchId, destinationRoot, exclusions);
   }
 
   public async organizeItem(
@@ -183,10 +197,15 @@ export class FileOrganizer {
     rules: OrganizationRules,
     requestedBatchId?: string,
     destinationRoot?: string,
+    exclusions: readonly ExclusionItem[] = [],
   ): Promise<OperationResult> {
     const itemName = path.basename(itemPath);
     const rawCategory = getOrganizableCategory(itemName, itemKind, rules);
     const batchId = requestedBatchId ?? randomUUID();
+
+    if (isPathExcluded(itemPath, exclusions)) {
+      return { success: true, message: 'Item is excluded from organization.', movedCount: 0, skippedCount: 1, failedCount: 0, batchId, movedItems: [] };
+    }
 
     if (rawCategory === 'other') {
       return { success: true, message: 'Item category is not enabled or supported.', movedCount: 0, skippedCount: 1, failedCount: 0, batchId, movedItems: [] };

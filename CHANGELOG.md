@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.6.6
+
+### Türkçe
+
+- Ayarlara “Hariç Tutulanlar” bölümü eklendi; “Dosya ekle” ve “Klasör ekle” düğmeleri Windows native seçicisini açar ve birden fazla öğe seçilebilir.
+- Eklenen öğeler ad, tam yol ve tür bilgisiyle listelenir; listeden kaldırma gerçek dosyayı diskten silmez.
+- Aynı yol ikinci kez eklenemez; Masaüstü veya İndirilenler kökünün tamamı hariç tutulamaz (bunun için radar kaynağı ayarı kullanılır).
+- Hariç tutulan dosya ve kısayollar yalnızca kendi yollarını, hariç tutulan klasörler kendilerini ve tüm alt yollarını kapsar; büyük/küçük harf ve sondaki `\` farkları güvenli biçimde normalleştirilir.
+- Hariç tutma kuralı ortak düzenleme katmanında uygulanır: manuel önizleme, manuel/otomatik düzenleme, başlangıçtaki mevcut öğe taraması ve Desktop/Public Desktop/Downloads watcher olaylarında atlanır ve işlem günlüğüne yazılmaz.
+- Liste ayarlarda kalıcı saklanır, değişiklikler yeniden başlatmadan aktif olur ve eski ayar dosyaları bozulmadan çalışır.
+- Hariç tutma eşleştirme, yinelenen ekleme, kök koruması ve düzenleme katmanı için otomatik testler eklendi.
+
+### English
+
+- Added an “Exclusions” section to Settings; “Add file” and “Add folder” open the native Windows picker and support multiple selections.
+- Added items are listed with name, full path, and type; removing an entry never deletes the real file from disk.
+- The same path cannot be added twice, and the entire Desktop or Downloads root cannot be excluded (use the radar source setting instead).
+- Excluded files and shortcuts cover only their own path; excluded folders cover themselves and all subpaths, with safe normalization of case and trailing `\` differences.
+- The exclusion rule is enforced in the shared organization layer: it is skipped in manual previews, manual/automatic organization, the startup existing-item scan, and Desktop/Public Desktop/Downloads watcher events, and it is never written to the operation log.
+- The list persists in settings, changes take effect without restarting, and old settings files keep working.
+- Added automated tests for exclusion matching, duplicate prevention, root protection, and the organization layer.
+
 ## 1.6.5
 
 - Windows masaüstü katmanında çalışan widget'ın şeffaf dış boşluğunda görünen siyah dikdörtgen kaldırıldı.

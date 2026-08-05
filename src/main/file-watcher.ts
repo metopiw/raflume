@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import chokidar, { type FSWatcher } from 'chokidar';
+import { isPathExcluded } from '../shared/exclusions';
 import { getOrganizableCategory, isCategoryFolder, isProtectedSystemItem, isTransientFile } from '../shared/file-categories';
 import type { AppSettings, OperationResult, OrganizableItemKind, WatchLocation, WatchedFile, WatchedPaths } from '../shared/types';
 import { createDirectoryMetadata, createFileMetadata } from './file-metadata';
@@ -46,7 +47,7 @@ export class FileWatcher {
         },
         ignored: (candidatePath) => {
           const name = path.basename(candidatePath);
-          return name.startsWith('.') || isCategoryFolder(name) || isProtectedSystemItem(name) || isTransientFile(name);
+          return name.startsWith('.') || isCategoryFolder(name) || isProtectedSystemItem(name) || isTransientFile(name) || isPathExcluded(candidatePath, this.settings.exclusions);
         },
       });
 
@@ -102,12 +103,13 @@ export class FileWatcher {
         try {
           const entries = await fs.readdir(folderPath, { withFileTypes: true });
           for (const entry of entries) {
-            if (entry.name.startsWith('.') || isTransientFile(entry.name) || isProtectedSystemItem(entry.name) || isCategoryFolder(entry.name)) continue;
+            const entryPath = path.join(folderPath, entry.name);
+            if (entry.name.startsWith('.') || isTransientFile(entry.name) || isProtectedSystemItem(entry.name) || isCategoryFolder(entry.name) || isPathExcluded(entryPath, this.settings.exclusions)) continue;
             if (entry.isFile()) {
-              const metadata = await createFileMetadata(path.join(folderPath, entry.name), source);
+              const metadata = await createFileMetadata(entryPath, source);
               if (metadata) files.push(metadata);
             } else if (entry.isDirectory() && this.settings.organizationRules.includeFolders) {
-              const metadata = await createDirectoryMetadata(path.join(folderPath, entry.name), source);
+              const metadata = await createDirectoryMetadata(entryPath, source);
               if (metadata) files.push(metadata);
             }
           }
@@ -128,7 +130,7 @@ export class FileWatcher {
   private async handleAddedItem(itemPath: string, itemKind: OrganizableItemKind): Promise<void> {
     try {
       const source = this.resolveSource(itemPath);
-      if (!source || isCategoryFolder(path.basename(itemPath)) || isProtectedSystemItem(path.basename(itemPath))) return;
+      if (!source || isCategoryFolder(path.basename(itemPath)) || isProtectedSystemItem(path.basename(itemPath)) || isPathExcluded(itemPath, this.settings.exclusions)) return;
 
       if (itemKind === 'directory') {
         if (!this.settings.organizationRules.includeFolders) return;

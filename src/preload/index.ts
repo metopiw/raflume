@@ -29,6 +29,9 @@ const api: DesktopOrganizerApi = {
   copyClipboardImage: (imageId: string) => ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_IMAGE_COPY, imageId) as Promise<OperationResult>,
   saveClipboardImage: (imageId: string) => ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_IMAGE_SAVE, imageId) as Promise<OperationResult>,
   clearClipboardImages: () => ipcRenderer.invoke(IPC_CHANNELS.CLIPBOARD_IMAGE_CLEAR) as Promise<OperationResult>,
+  addExclusionFiles: () => ipcRenderer.invoke(IPC_CHANNELS.EXCLUSIONS_ADD_FILES) as Promise<AppSnapshot>,
+  addExclusionFolders: () => ipcRenderer.invoke(IPC_CHANNELS.EXCLUSIONS_ADD_FOLDERS) as Promise<AppSnapshot>,
+  removeExclusion: (itemPath: string) => ipcRenderer.invoke(IPC_CHANNELS.EXCLUSIONS_REMOVE, itemPath) as Promise<AppSnapshot>,
   onSnapshotUpdated: (callback: (snapshot: AppSnapshot) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, snapshot: AppSnapshot) => callback(snapshot);
     ipcRenderer.on(IPC_CHANNELS.APP_SNAPSHOT_UPDATED, listener);
